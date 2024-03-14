@@ -1,0 +1,15 @@
+[
+  {
+    "Id": 1,
+    "UserTypeId": 1,
+    "Verified": true,
+    "Blocked": false,
+    "FirstName": "Nicolas",
+    "LastName": "Chourot",
+    "GenderId": 1,
+    "Email": "nicolaschourot@videotron.ca",
+    "Avatar": "/Images_Data/User_Avatars/8f4fcab1-187c-4808-b1d6-f1138a7c0cd2.jpeg",
+    "Password": "password",
+    "CreationDate": "2024-03-14T11:46:53.6287006-04:00"
+  }
+]
