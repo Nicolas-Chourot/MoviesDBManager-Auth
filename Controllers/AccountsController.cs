@@ -38,16 +38,24 @@ namespace MoviesDBManager.Controllers
             user.UserTypeId = 3; // self subscribed user 
             if (ModelState.IsValid)
             {
-                user = DB.Users.Create(user);
-                if (user != null)
+                if (user.Avatar == Models.User.DefaultImage) 
                 {
-                    SendEmailVerification(user, user.Email);
-                    return RedirectToAction("SubscribeDone/" + user.Id.ToString());
+                    // required avatar image
+                    ModelState.AddModelError("Avatar", "Veuillez choisir votre avatar");
+                    ViewBag.Genders = SelectListUtilities<Gender>.Convert(DB.Genders.ToList());
                 }
                 else
-                    return RedirectToAction("Report", "Errors", new { message = "Échec de création de compte" });
+                {
+                    user = DB.Users.Create(user);
+                    if (user != null)
+                    {
+                        SendEmailVerification(user, user.Email);
+                        return RedirectToAction("SubscribeDone/" + user.Id.ToString());
+                    }
+                    else
+                        return RedirectToAction("Report", "Errors", new { message = "Échec de création de compte" });
+                }
             }
-            ViewBag.Genders = SelectListUtilities<Gender>.Convert(DB.Genders.ToList());
             return View(user);
         }
 
@@ -199,7 +207,7 @@ namespace MoviesDBManager.Controllers
                 string verificationUrl = Url.Action("ResetPassword", "Accounts", null, Request.Url.Scheme);
                 String Link = @"<br/><a href='" + verificationUrl + "?code=" + resetPasswordCommand.VerificationCode + @"' > Réinitialisation de mot de passe...</a>";
 
-                string Subject = "ChatManager - Réinitialisaton ...";
+                string Subject = "Répertoire de films - Réinitialisaton ...";
 
                 string Body = "Bonjour " + user.GetFullName(true) + @",<br/><br/>";
                 Body += @"Vous avez demandé de réinitialiser votre mot de passe. <br/>";
@@ -256,10 +264,10 @@ namespace MoviesDBManager.Controllers
         [OnlineUsers.UserAccess]
         public ActionResult Profil()
         {
-            ViewBag.Genders = SelectListUtilities<Gender>.Convert(DB.Genders.ToList());
             User userToEdit = OnlineUsers.GetSessionUser().Clone();
             if (userToEdit != null)
             {
+                ViewBag.Genders = new SelectList(DB.Genders.ToList(), "Id", "Name", userToEdit.GenderId);
                 Session["UnchangedPasswordCode"] = Guid.NewGuid().ToString().Substring(0, 12);
                 userToEdit.Password = userToEdit.ConfirmPassword = (string)Session["UnchangedPasswordCode"];
                 return View(userToEdit);
@@ -276,7 +284,6 @@ namespace MoviesDBManager.Controllers
             user.Verified = currentUser.Verified;
             user.UserTypeId = currentUser.UserTypeId;
             user.Blocked = currentUser.Blocked;
-            user.Avatar = currentUser.Avatar;
             user.CreationDate = currentUser.CreationDate;
 
             string newEmail = "";
@@ -299,10 +306,10 @@ namespace MoviesDBManager.Controllers
                         return RedirectToAction("EmailChangedAlert");
                     }
                     else
-                        return RedirectToAction("Index", "Movies");
+                        return Redirect((string)Session["LastAction"]);
                 }
             }
-            ViewBag.Genders = SelectListUtilities<Gender>.Convert(DB.Genders.ToList());
+            ViewBag.Genders = new SelectList(DB.Genders.ToList(), "Id", "Name", user.GenderId);
             return View(currentUser);
         }
         #endregion

@@ -8,11 +8,10 @@
 {
     @Html.AntiForgeryToken()
 
-<div class="form-formLayout">
-    <h4>@pageTitle</h4>
+<div class="formLayout">
+    <h3>@pageTitle</h3>
     <hr />
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    @Html.HiddenFor(model => model.Id)
 
     <fieldset>
         <div class="legend">

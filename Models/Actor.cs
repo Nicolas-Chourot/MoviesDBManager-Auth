@@ -29,6 +29,10 @@ namespace MoviesDBManager.Models
         [Display(Name = "Nationalité")]
         public string CountryCode { get; set; }
 
+        public bool AvatarSet()
+        {
+            return Avatar != Actor_Avatars_Folder + Default_Avatar;
+        }
         [JsonIgnore]
         public List<Movie> Movies
         {

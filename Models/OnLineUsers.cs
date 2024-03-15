@@ -42,13 +42,18 @@ namespace MoviesDBManager.Models
             {
                 User sessionUser = OnlineUsers.GetSessionUser();
                 if (sessionUser != null)
+                {
                     if (sessionUser.Blocked)
                     {
                         RemoveSessionUser();
                         httpContext.Response.Redirect("~/Accounts/Login?message=Compte bloqué!");
                         return false;
                     }
-                return true;
+                    return true;
+                }
+                httpContext.Response.Redirect("~/Accounts/Login?message=Accès non autorisé!");
+                return false;
+
             }
         }
         public class PowerUserAccess : AuthorizeAttribute

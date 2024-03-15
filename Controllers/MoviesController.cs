@@ -7,14 +7,14 @@ using System.Web.Mvc;
 
 namespace MoviesDBManager.Controllers
 {
+    [OnlineUsers.UserAccess]
     public class MoviesController : Controller
     {
-        [OnlineUsers.UserAccess]
         public ActionResult Index()
         {
+            Session["LastAction"] = "/Movies/index";
             return View();
         }
-        [OnlineUsers.UserAccess]
         public ActionResult Movies(bool forceRefresh = false)
         {
             if (forceRefresh || DB.Movies.HasChanged)
@@ -23,6 +23,7 @@ namespace MoviesDBManager.Controllers
             }
             return null;
         }
+
         [OnlineUsers.PowerUserAccess]
         public ActionResult Create()
         {
@@ -30,6 +31,7 @@ namespace MoviesDBManager.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Create(Movie movie, List<int> SelectedActors, List<int> SelectedDistributorsId)
         {
             if (ModelState.IsValid)
@@ -41,38 +43,50 @@ namespace MoviesDBManager.Controllers
         }
         public ActionResult Details(int id)
         {
+            Session["LastAction"] = "/Movies/Details/" + id;
             Movie movie = DB.Movies.Get(id);
             if (movie != null)
             {
+                Session["CurrentMovieId"] = movie.Id;
                 return View(movie);
             }
             return RedirectToAction("Index");
         }
-
         [OnlineUsers.PowerUserAccess]
-        public ActionResult Edit(int id)
+        public ActionResult Edit()
         {
-            Movie movie = DB.Movies.Get(id);
-            if (movie != null)
+            if (Session["CurrentMovieId"] != null)
             {
-               return View(movie);
+                Movie movie = DB.Movies.Get((int)Session["CurrentMovieId"]);
+                if (movie != null)
+                {
+                    return View(movie);
+                }
             }
             return RedirectToAction("Index");
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Edit(Movie movie, List<int> SelectedActors, List<int> SelectedDistributors)
         {
+            movie.Id = (int)Session["CurrentMovieId"];
             if (ModelState.IsValid)
             {
                 DB.Movies.Update(movie, SelectedActors, SelectedDistributors);
-                return RedirectToAction("Details", new { id = movie.Id });
+                Session["CurrentMovieId"] = null;
+                return Redirect((string)Session["LastAction"]);
             }
             return View();
         }
-        public ActionResult Delete(int id)
+        [OnlineUsers.PowerUserAccess]
+        public ActionResult Delete()
         {
-            DB.Movies.Delete(id);
+            if (Session["CurrentMovieId"] != null)
+            {
+                DB.Movies.Delete((int)Session["CurrentMovieId"]);
+                Session["CurrentMovieId"] = null;
+            }
             return RedirectToAction("Index");
         }
     }

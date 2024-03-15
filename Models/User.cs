@@ -9,8 +9,11 @@ namespace MoviesDBManager.Models
 {
     public class User
     {
-        const string User_Avatars_Folder = @"/Images_Data/User_Avatars/";
-        const string Default_Avatar = @"no_avatar.png";
+        public const string User_Avatars_Folder = @"/Images_Data/User_Avatars/";
+        public const string Default_Avatar = @"no_avatar.png";
+
+        [JsonIgnore]
+        public static string DefaultImage {  get { return User_Avatars_Folder + Default_Avatar; } }
 
         public User Clone()
         {
@@ -37,7 +40,7 @@ namespace MoviesDBManager.Models
 
         [Display(Name = "Avatar")]
         [ImageAsset(User_Avatars_Folder, Default_Avatar)]
-        public string Avatar { get; set; } = User_Avatars_Folder + Default_Avatar;
+        public string Avatar { get; set; } = DefaultImage;
 
         [Display(Name = "Mot de passe"), Required(ErrorMessage = "Obligatoire")]
         [StringLength(50, ErrorMessage = "Le mot de passe doit comporter au moins {2} caractères.", MinimumLength = 6)]

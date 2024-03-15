@@ -7,10 +7,12 @@ using MoviesDBManager.Models;
 
 namespace MoviesDBManager.Controllers
 {
+    [OnlineUsers.UserAccess]
     public class ActorsController : Controller
     {
         public ActionResult Index()
         {
+            Session["LastAction"] = "/Actors/index";
             return View();
         }
         public ActionResult Actors(bool forceRefresh = false)
@@ -21,12 +23,13 @@ namespace MoviesDBManager.Controllers
             }
             return null;
         }
+        [OnlineUsers.PowerUserAccess]
         public ActionResult Create()
         {
             return View(new Actor());
         }
-
         [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Create(Actor actor, List<int> SelectedMovies)
         {
             if (ModelState.IsValid)
@@ -36,41 +39,52 @@ namespace MoviesDBManager.Controllers
             }
             return View();
         }
-
         public ActionResult Details(int id)
         {
+            Session["LastAction"] = "/Actors/Details/" + id;
             Actor actor = DB.Actors.Get(id);
             if (actor != null)
             {
+                Session["CurrentActorId"] = actor.Id;
                 return View(actor);
             }
+            Session["CurrentActorId"] = null;
             return RedirectToAction("Index");
         }
-
-        public ActionResult Edit(int id)
+        [OnlineUsers.PowerUserAccess]
+        public ActionResult Edit()
         {
-            Actor actor = DB.Actors.Get(id);
-            if (actor != null)
+            if (Session["CurrentActorId"] != null)
             {
-                return View(actor);
+                Actor actor = DB.Actors.Get((int)Session["CurrentActorId"]);
+                if (actor != null)
+                {
+                    return View(actor);
+                }
             }
             return RedirectToAction("Index");
         }
-
         [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Edit(Actor actor, List<int> SelectedMovies)
         {
+            actor.Id = (int)Session["CurrentActorId"];
             if (ModelState.IsValid)
             {
                 DB.Actors.Update(actor, SelectedMovies);
-                return RedirectToAction("Details", new {id = actor.Id });
+                Session["CurrentActorId"] = null;
+                return Redirect((string)Session["LastAction"]);
             }
             return View(actor);
         }
-
-        public ActionResult Delete(int id)
+        [OnlineUsers.PowerUserAccess]
+        public ActionResult Delete()
         {
-            DB.Actors.Delete(id);
+            if (Session["CurrentActorId"] != null)
+            {
+                DB.Actors.Delete((int)Session["CurrentActorId"]);
+                Session["CurrentActorId"] = null;
+            }
             return RedirectToAction("Index");
         }
     }

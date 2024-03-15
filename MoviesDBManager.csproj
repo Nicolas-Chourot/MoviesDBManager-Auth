@@ -209,6 +209,7 @@
     <Content Include="Images_Data\Distributor_Logos\92cf25ec-a603-4479-aa3e-23bec72ee300.Jpeg" />
     <Content Include="Images_Data\Distributor_Logos\9c84613f-90a0-4234-98ee-d48c97d05c85.Jpeg" />
     <Content Include="Images_Data\Distributor_Logos\a26202e6-bb37-465a-ba24-06b10f685aa1.Jpeg" />
+    <Content Include="Images_Data\Distributor_Logos\dc5c9526-5808-46b4-8088-db6c208a6911.jpeg" />
     <Content Include="Images_Data\Distributor_Logos\e1fdc50d-7949-48dd-b831-7702f3644f31.Jpeg" />
     <Content Include="Images_Data\Distributor_Logos\No_Logo.png" />
     <Content Include="Images_Data\Loading_icon.gif" />
@@ -224,6 +225,7 @@
     <Content Include="Images_Data\Movie_Posters\no_poster.png" />
     <Content Include="Images_Data\No_Image.png" />
     <Content Include="Images_Data\User_Avatars\8f4fcab1-187c-4808-b1d6-f1138a7c0cd2.jpeg" />
+    <Content Include="Images_Data\User_Avatars\dc030981-588c-4130-97f4-7f38fbee5db4.jpeg" />
     <Content Include="Images_Data\User_Avatars\no_avatar.png" />
     <Content Include="info-icon.png" />
     <Content Include="Scripts\bootbox.js" />

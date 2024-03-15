@@ -8,10 +8,12 @@ using System.Web.Mvc;
 
 namespace MoviesDBManager.Controllers
 {
+    [OnlineUsers.UserAccess]
     public class DistributorsController : Controller
     {
         public ActionResult Index()
         {
+            Session["LastAction"] = "/Distributors/index";
             return View();
         }
         public PartialViewResult Distributors(bool forceRefresh = false)
@@ -22,12 +24,13 @@ namespace MoviesDBManager.Controllers
             }
             return null;
         }
+        [OnlineUsers.PowerUserAccess]
         public ActionResult Create()
         {
             return View(new Distributor());
         }
-
         [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Create(Distributor distributor, List<int> SelectedMoviesId)
         {
             if (ModelState.IsValid)
@@ -37,41 +40,51 @@ namespace MoviesDBManager.Controllers
             }
             return View();
         }
-
         public ActionResult Details(int id)
         {
+            Session["LastAction"] = "/Distributors/Details/" + id;
             Distributor distributor = DB.Distributors.Get(id);
             if (distributor != null)
             {
+                Session["CurrentDistributorId"] = distributor.Id;
                 return View(distributor);
             }
             return RedirectToAction("Index");
         }
-
-        public ActionResult Edit(int id)
+        [OnlineUsers.PowerUserAccess]
+        public ActionResult Edit()
         {
-            Distributor distributor = DB.Distributors.Get(id);
-            if (distributor != null)
+            if (Session["CurrentDistributorId"] != null)
             {
-                return View(distributor);
+                Distributor distributor = DB.Distributors.Get((int)Session["CurrentDistributorId"]);
+                if (distributor != null)
+                {
+                    return View(distributor);
+                }
             }
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
         }
-
         [HttpPost]
+        [ValidateAntiForgeryToken()]
         public ActionResult Edit(Distributor distributor, List<int> SelectedMovies)
         {
+            distributor.Id = (int)Session["CurrentDistributorId"];
             if (ModelState.IsValid)
             {
                 DB.Distributors.Update(distributor, SelectedMovies);
-                return RedirectToAction("Index");
+                Session["CurrentDistributorId"] = null;
+                return Redirect((string)Session["LastAction"]);
             }
             return View(distributor);
         }
-
-        public ActionResult Delete(int id)
+        [OnlineUsers.PowerUserAccess]
+        public ActionResult Delete()
         {
-            DB.Distributors.Delete(id);
+            if (Session["CurrentDistributorId"] != null)
+            {
+                DB.Distributors.Delete((int)Session["CurrentDistributorId"]);
+                Session["CurrentDistributorId"] = null;
+            }
             return RedirectToAction("Index");
         }
     }
