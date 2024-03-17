@@ -337,6 +337,7 @@ namespace MoviesDBManager.Controllers
                     return View(loginCredential);
                 }
                 User user = DB.Users.GetUser(loginCredential);
+               
                 if (user == null)
                 {
                     ModelState.AddModelError("Password", "Mot de passe incorrect.");
