@@ -13,13 +13,12 @@ namespace MoviesDBManager.Controllers
 
         #region Account creation
         [HttpPost]
-        [OnlineUsers.UserAccess]
         public JsonResult EmailAvailable(string email)
         {
             User onLineUser = OnlineUsers.GetSessionUser();
-            return Json(DB.Users.EmailAvailable(email, onLineUser.Id));
+            int id = onLineUser != null? onLineUser.Id : 0;
+            return Json(DB.Users.EmailAvailable(email, id));
         }
-
         [HttpPost]
         public JsonResult EmailExist(string email)
         {
